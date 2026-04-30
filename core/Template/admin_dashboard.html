@@ -1,0 +1,99 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<main class="p-4">
+    <h2 class="mb-4">Admin Dashboard</h2>
+
+    <!-- Charts Row -->
+    <div class="row mb-4 g-3">
+        <!-- Application Doughnut -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm p-3 h-100">
+                <h5 class="text-secondary fw-bold">Applications Overview</h5>
+                <div style="height: 300px;">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event Capacity Bar -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm p-3 h-100">
+                <h5 class="text-secondary fw-bold">Events Overview</h5>
+                <div style="height: 300px;">
+                    <canvas id="eventCapacityChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Navigation Row -->
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="card p-4 border-0 shadow-sm border-start border-primary border-4">
+                <h5>Events</h5>
+                <p class="text-muted">Manage all event approvals and logistical details.</p>
+                <a href="{% url 'admin_events' %}" class="btn btn-primary w-25">Open</a>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card p-4 border-0 shadow-sm border-start border-success border-4">
+                <h5>Applications</h5>
+                <p class="text-muted">Review, approve, or reject student applicants.</p>
+                <a href="{% url 'admin_applications' %}" class="btn btn-success w-25">Open</a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    // Chart 1: Status (Fixed unique variable name 'ctx1')
+    const ctx1 = document.getElementById('statusChart').getContext('2d');
+    new Chart(ctx1, {
+        type: 'doughnut',
+        data: {
+            labels: {{ chart_labels|safe }},
+            datasets: [{
+                data: {{ chart_data|safe }},
+                backgroundColor: ['#ffc107', '#198754', '#dc3545'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+
+    // Chart 2: Capacity (Fixed unique variable name 'ctx2')
+    const ctx2 = document.getElementById('eventCapacityChart').getContext('2d');
+    new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: {{ event_labels|safe }},
+            datasets: [
+                {
+                    label: 'Approved',
+                    data: {{ approved_data|safe }},
+                    backgroundColor: '#198754',
+                },
+                {
+                    label: 'Total Applications',
+                    data: {{ total_app_data|safe }},
+                    backgroundColor: '#0d6efd',
+                }
+            ]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'top' } }
+        }
+    });
+</script>
+{% endblock %}

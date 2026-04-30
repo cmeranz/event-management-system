@@ -1,0 +1,136 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold">Events</h3>
+    <span class="badge bg-secondary">{{ events|length }} Total Events</span>
+</div>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-3">Event Title</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th class="text-end pe-5" style="width: 250px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in events %}
+                <tr>
+                    <td class="ps-3 fw-semibold text-dark">{{ event.event_title }}</td>
+                    <td>{{ event.event_date|date:"M d, Y" }}</td>
+                    <td>
+                        {% if event.event_approval_status == 'Pending' %}
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2"> <i class="bi bi-hourglass-split me-1"></i>Pending</span>
+                        {% elif event.event_approval_status == 'Approved' %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
+          <i class="bi bi-check-circle me-1"></i> Approved
+        </span>
+                        {% else %}
+                           <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2">
+          <i class="bi bi-x-circle me-1"></i> Rejected
+        </span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end pe-3">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#eventModal{{event.id}}">
+                                <i class="bi bi-eye"></i> View
+                            </button>
+
+                            {% if event.event_approval_status == 'Pending' %}
+                            <form action="{% url 'update_event_status' event.id %}" method="POST" class="d-inline ms-1">
+                                {% csrf_token %}
+                                <button name="status" type="submit" value="Approved" class="btn btn-success btn-sm" title="Approve">
+                                    Approve</i>
+                                </button>
+                                <button name="status" type="submit" value="Rejected" class="btn btn-danger btn-sm" title="Reject">
+                                    Reject</i>
+                                </button>
+                            </form>
+                            {% else %}
+                            <button class="btn btn-light btn-sm ms-1" disabled>
+                                <i class="bi bi-shield-check"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+
+
+                    </td>
+                </tr>
+                <!-- Modal -->
+                        <div class="modal fade" id="eventModal{{event.id}}" tabindex="-1" aria-labelledby="modalLabel{{event.id}}" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content border-0 shadow">
+                                    <div class="modal-header bg-light">
+                                        <h5 class="modal-title fw-bold" id="modalLabel{{event.id}}">{{ event.event_title }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body text-center">
+                                        {% if event.event_image %}
+                                            <img src="{{ event.event_image.url }}" class="img-fluid rounded shadow-sm mb-3" alt="Event Image" style="max-height: 250px; width: 100%; object-fit: cover;">
+                                        {% else %}
+                                            <div class="bg-light py-5 mb-3 border rounded text-muted">
+                                                <i class="bi bi-image fs-1"></i><br>No Image Provided
+                                            </div>
+                                        {% endif %}
+
+                                        <div class="text-start p-2">
+                                            <div class="mb-2">
+                                                <span class="text-muted small text-uppercase fw-bold">Date:</span>
+                                                <p class="mb-0">{{ event.event_date }}</p>
+                                            </div>
+                                            <div>
+                                                <span class="text-muted small text-uppercase fw-bold">Description:</span>
+                                                <p class="text-secondary">{{ event.event_description|linebreaks }}</p>
+                                            </div>
+                                            <div class="col-6">
+
+                                            <span class="text-muted small text-uppercase fw-bold">Capacity:</span>
+                                            <p class="mb-0 text-dark">
+                                                <i class="bi bi-people-fill me-1"></i>
+                                                {{ event.event_capacity|default:"Unlimited" }} Pax
+                                            </p>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer border-top-0">
+                                        <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Pop up script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const buttons = document.querySelectorAll('.view-event-btn');
+    buttons.forEach(button => {
+        button.addEventListener('click', function() {
+            const eventId = this.getAttribute('data-id');
+            const modalElement = document.getElementById('eventModal' + eventId);
+            if (modalElement) {
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+            } else {
+                console.error("Modal not found: eventModal" + eventId);
+            }
+        });
+    });
+});
+</script>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center py-5 text-muted">
+                        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                        No events found in the database.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
