@@ -3,7 +3,8 @@ from datetime import time, timedelta
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.db.models import Q
-from .models import Event, Application
+from .models import Event, Application, SavedEvent, Bookmark
+from django.contrib.auth.decorators import login_required
 
 # --- General Navigation ---
 
@@ -156,3 +157,85 @@ def admin_dashboard(request):
         'total_app_data': [e.total_apps for e in events],
     }
     return render(request, 'admin_dashboard.html', context)
+
+# ===============================
+# EVENT DISCOVERY MODULE
+# ===============================
+
+def event_list(request):
+    events = Event.objects.filter(event_approval_status='Approved')
+
+    search = request.GET.get('search')
+    category = request.GET.get('category')
+    skill = request.GET.get('skill')
+    date = request.GET.get('date')
+
+    if search:
+        events = events.filter(event_title__icontains=search)
+
+    if category:
+        events = events.filter(event_category__icontains=category)
+
+    if skill:
+        events = events.filter(skill_tags__icontains=skill)
+    
+    if date:
+        events = events.filter(event_date=date)
+
+    context = {
+        'events': events.order_by('event_date')
+    }
+
+    return render(request, 'event_list.html', context)
+
+
+def event_detail(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+
+    context = {
+        'event': event
+    }
+
+    return render(request, 'event_detail.html', context)
+
+@login_required
+def save_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+
+    SavedEvent.objects.get_or_create(
+        user=request.user,
+        event=event
+    )
+
+    return redirect('event_list')
+
+
+@login_required
+def saved_events(request):
+    saved = SavedEvent.objects.filter(user=request.user)
+
+    return render(request, 'saved_events.html', {
+        'saved_events': saved
+    })
+
+def save_event(request, event_id):
+    if request.user.is_authenticated:
+        event = get_object_or_404(Event, id=event_id)
+
+        Bookmark.objects.get_or_create(
+            user=request.user,
+            event=event
+        )
+
+    return redirect('event_list')
+
+def saved_events(request):
+    bookmarks = Bookmark.objects.filter(
+        user=request.user
+    ).select_related('event')
+
+    return render(
+        request,
+        'saved_events.html',
+        {'bookmarks': bookmarks}
+    )

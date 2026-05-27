@@ -1,0 +1,15 @@
+<h1>Saved Events</h1>
+
+<ul>
+{% for bookmark in bookmarks %}
+    <li>
+        <a href="{% url 'event_detail' bookmark.event.id %}">
+            {{ bookmark.event.event_title }}
+        </a>
+    </li>
+{% empty %}
+    <li>No saved events yet.</li>
+{% endfor %}
+</ul>
+
+<a href="/events/">Back to Events</a>
