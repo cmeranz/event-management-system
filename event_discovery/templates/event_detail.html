@@ -1,0 +1,30 @@
+{% extends 'admin_base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2>{{ event.event_title }}</h2>
+
+    {% if event.event_image %}
+    <img src="{{ event.event_image.url }}"
+         class="img-fluid mb-3"
+         style="max-width:500px;">
+    {% endif %}
+
+    <div class="card p-4 shadow">
+        <p><strong>Description:</strong> {{ event.event_description }}</p>
+        <p><strong>Date:</strong> {{ event.event_date }}</p>
+        <p><strong>Location:</strong> {{ event.event_location }}</p>
+        <p><strong>Category:</strong> {{ event.event_category }}</p>
+        <p><strong>Skills:</strong> {{ event.skill_tags }}</p>
+        <p><strong>Points:</strong> {{ event.points_awarded }}</p>
+        <p><strong>Capacity:</strong> {{ event.event_capacity }}</p>
+    </div>
+
+    <a href="/events/" class="btn btn-secondary mt-3">
+        Back to Events
+    </a>
+
+</div>
+
+{% endblock %}

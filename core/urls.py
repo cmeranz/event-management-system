@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 urlpatterns = [
@@ -9,8 +9,5 @@ urlpatterns = [
     path('update-status/<int:event_id>/', views.update_event_status, name='update_event_status'),
     path('update-status/<int:pk>/<str:status>/', views.update_application_status, name='update_application_status'),
     path('export-applications/', views.export_applications_csv, name='export_applications_csv'),
-    path('events/', views.event_list, name='event_list'),
-    path('events/<int:event_id>/', views.event_detail, name='event_detail'),
-    path('save-event/<int:event_id>/', views.save_event, name='save_event'),
-    path('events/saved/', views.saved_events, name='saved_events'),
+    path('events/', include('event_discovery.urls')),
 ]
