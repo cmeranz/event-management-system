@@ -68,24 +68,3 @@ class Application(models.Model):
 
     def __str__(self):
         return f"{self.application_applicant.username} - {self.application_event.event_title}"
-
-class SavedEvent(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    saved_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ('user', 'event')
-
-    def __str__(self):
-        return f"{self.user.username} saved {self.event.event_title}"
-
-class Bookmark(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = ('user', 'event')
-
-    def __str__(self):
-        return f"{self.user.username} saved {self.event.event_title}"
