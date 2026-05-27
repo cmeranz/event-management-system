@@ -1,0 +1,155 @@
+{% extends 'admin_base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+        <h2 class="fw-bold text-primary">
+            🔖 Saved Events
+        </h2>
+    </div>
+
+    <div class="d-flex gap-2">
+
+        <a href="{% url 'saved_events' %}?view=card"
+           class="btn btn-outline-primary btn-sm">
+            Card View
+        </a>
+
+        <a href="{% url 'saved_events' %}?view=list"
+           class="btn btn-outline-dark btn-sm">
+            List View
+        </a>
+
+    </div>
+
+    </div>
+
+    {% if bookmarks %}
+
+        {% if view_mode == 'list' %}
+
+            <div class="list-group">
+
+                {% for bookmark in bookmarks %}
+
+                <div class="list-group-item mb-3 shadow-sm rounded">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <h5 class="mb-1">
+                                <a href="{% url 'event_detail' bookmark.event.id %}"
+                                   class="text-decoration-none">
+                                    {{ bookmark.event.event_title }}
+                                </a>
+                            </h5>
+
+                            <p class="mb-1">
+                                {{ bookmark.event.event_category }}
+                            </p>
+
+                            <small class="text-muted">
+                                📅 {{ bookmark.event.event_date }}
+                            </small>
+
+                        </div>
+
+                        <div>
+
+                            <a href="{% url 'delete_saved_event' bookmark.id %}"
+                               class="btn btn-danger btn-sm">
+                                🗑 Delete
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="row">
+
+                {% for bookmark in bookmarks %}
+
+                <div class="col-md-4">
+
+                    <div class="card shadow-sm mb-4 h-100">
+
+                        {% if bookmark.event.event_image %}
+                        <img src="{{ bookmark.event.event_image.url }}"
+                             class="card-img-top"
+                             style="height:220px; object-fit:cover;">
+                        {% endif %}
+
+                        <div class="card-body d-flex flex-column">
+
+                            <h5 class="card-title">
+                                {{ bookmark.event.event_title }}
+                            </h5>
+
+                            <p class="text-muted mb-1">
+                                {{ bookmark.event.event_category }}
+                            </p>
+
+                            <p>
+                                📅 {{ bookmark.event.event_date }}
+                            </p>
+
+                            <div class="mt-auto">
+
+                                <a href="{% url 'event_detail' bookmark.event.id %}"
+                                   class="btn btn-success btn-sm">
+                                    View Details
+                                </a>
+
+                                <a href="{% url 'delete_saved_event' bookmark.id %}"
+                                   class="btn btn-danger btn-sm">
+                                    🗑 Delete
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+    {% else %}
+
+        <div class="alert alert-info shadow-sm">
+            No saved events yet.
+        </div>
+
+    {% endif %}
+
+    <!-- BACK BUTTON -->
+
+    <div class="mt-4 text-end">
+
+        <a href="{% url 'event_list' %}"
+           class="btn btn-primary">
+            ⬅ Back to Discover Events
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

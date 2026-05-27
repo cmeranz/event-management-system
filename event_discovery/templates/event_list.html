@@ -1,0 +1,244 @@
+{% extends 'admin_base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+
+        <!-- LEFT -->
+        <div class="d-flex align-items-center gap-3">
+
+            <!-- HOME BUTTON -->
+            <a href="{% url 'event_list' %}"
+               class="btn btn-outline-secondary">
+                🏠
+            </a>
+
+            <!-- TITLE -->
+            <a href="{% url 'event_list' %}"
+               class="text-decoration-none">
+                <h2 class="fw-bold text-primary m-0">
+                    Discover Events
+                </h2>
+            </a>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="d-flex gap-2 flex-wrap">
+
+            <!-- SAVED EVENTS -->
+            <a href="{% url 'saved_events' %}"
+               class="btn btn-warning">
+                🔖 Saved Events
+            </a>
+
+            <!-- VIEW SWITCH -->
+            <button type="button"
+                    onclick="setCardView()"
+                    class="btn btn-outline-primary btn-sm">
+                Card View
+            </button>
+
+            <button type="button"
+                    onclick="setListView()"
+                    class="btn btn-outline-dark btn-sm">
+                List View
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- SEARCH + FILTER -->
+    <form method="GET" class="row g-2 mb-4">
+
+        <div class="col-md-3">
+            <input type="text"
+                   name="search"
+                   class="form-control"
+                   placeholder="Search event"
+                   value="{{ request.GET.search }}">
+        </div>
+
+        <div class="col-md-2">
+            <input type="text"
+                   name="category"
+                   class="form-control"
+                   placeholder="Category"
+                   value="{{ request.GET.category }}">
+        </div>
+
+        <div class="col-md-2">
+            <input type="text"
+                   name="skill"
+                   class="form-control"
+                   placeholder="Skill"
+                   value="{{ request.GET.skill }}">
+        </div>
+
+        <div class="col-md-2">
+            <input type="date"
+                   name="date"
+                   class="form-control"
+                   value="{{ request.GET.date }}">
+        </div>
+
+        <div class="col-md-2">
+            <button class="btn btn-primary w-100">
+                Search
+            </button>
+        </div>
+
+    </form>
+
+    <!-- CARD VIEW -->
+    <div class="row" id="card-view">
+
+        {% for event in events %}
+
+        <div class="col-md-4">
+
+            <div class="card shadow mb-4 h-100">
+
+                {% if event.event_image %}
+                <img src="{{ event.event_image.url }}"
+                     class="card-img-top"
+                     style="height:220px; object-fit:cover;">
+                {% endif %}
+
+                <div class="card-body d-flex flex-column">
+
+                    <h5 class="fw-bold">
+                        {{ event.event_title }}
+                    </h5>
+
+                    <p class="mb-2">
+                        <strong>Category:</strong>
+                        {{ event.event_category }}
+                    </p>
+
+                    <p class="mb-2">
+                        <strong>Date:</strong>
+                        {{ event.event_date }}
+                    </p>
+
+                    <p class="mb-3">
+                        <strong>Skills:</strong>
+                        {{ event.skill_tags }}
+                    </p>
+
+                    <div class="mt-auto d-flex gap-2">
+
+                        <a href="{% url 'event_detail' event.id %}"
+                           class="btn btn-success">
+                            View Details
+                        </a>
+
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'save_event' event.id %}" class="btn btn-primary">Save</a>
+
+                        {% else %}
+                            <a href="/login/" class="btn btn-outline-primary">Login to Save</a>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% empty %}
+
+        <div class="col-12">
+            <div class="alert alert-warning">
+                No approved events found.
+            </div>
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    <!-- LIST VIEW -->
+    <div id="list-view" style="display:none;">
+
+        {% for event in events %}
+
+        <div class="card shadow-sm mb-3">
+
+            <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+                <div>
+
+                    <h5 class="fw-bold mb-1">
+                        {{ event.event_title }}
+                    </h5>
+
+                    <small class="text-muted">
+                        {{ event.event_category }}
+                        •
+                        {{ event.event_date }}
+                        •
+                        {{ event.skill_tags }}
+                    </small>
+
+                </div>
+
+                <div class="d-flex gap-2">
+
+                    <a href="{% url 'event_detail' event.id %}"
+                       class="btn btn-success btn-sm">
+                        Details
+                    </a>
+
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'save_event' event.id %}" class="btn btn-primary btn-sm">Save</a>
+
+                    {% else %}
+                        <a href="/login/" class="btn btn-outline-primary btn-sm">Login to Save</a>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% empty %}
+
+        <div class="alert alert-warning">
+            No approved events found.
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+<!-- JAVASCRIPT -->
+<script>
+
+function setListView() {
+
+    document.getElementById("card-view").style.display = "none";
+    document.getElementById("list-view").style.display = "block";
+
+}
+
+function setCardView() {
+
+    document.getElementById("card-view").style.display = "flex";
+    document.getElementById("list-view").style.display = "none";
+
+}
+
+</script>
+
+{% endblock %}
