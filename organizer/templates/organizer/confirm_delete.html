@@ -1,0 +1,28 @@
+{% extends "organizer/organizer_base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card soft-card">
+            <div class="card-body p-4 text-center">
+                <div class="bg-danger-subtle text-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                     style="width: 64px; height: 64px;">
+                    <i class="bi bi-trash fs-3"></i>
+                </div>
+
+                <h3 class="fw-bold">Delete Event?</h3>
+                <p class="text-muted">
+                    Are you sure you want to delete <strong>{{ event.event_title }}</strong>?
+                    This action cannot be undone.
+                </p>
+
+                <form method="POST" class="d-flex justify-content-center gap-2 mt-4">
+                    {% csrf_token %}
+                    <a href="{% url 'organizer:events' %}" class="btn btn-light border px-4">Cancel</a>
+                    <button type="submit" class="btn btn-danger px-4">Delete Event</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

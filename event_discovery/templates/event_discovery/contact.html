@@ -1,0 +1,200 @@
+{% extends "event_discovery/public_base.html" %}
+{% load static %}
+{% static "event_discovery/images/banner1.png" as contact_banner %}
+{% block content %}
+
+<section class="contact-hero">
+    <div class="container">
+        <div class="row align-items-end">
+            <div class="col-lg-8">
+                <div class="eyebrow mb-2">Get in Touch</div>
+                <h1 class="display-title text-white mb-3">
+                    Contact the UM Engage team
+                </h1>
+                <p class="text-white-75 lead mb-0">
+                    Need help with your account, an event application, or organising an event?
+                    Reach out to us and we will respond as soon as possible.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-soft py-5">
+    <div class="container py-4">
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <a href="mailto:engage@um.edu.my" class="contact-card text-decoration-none">
+                    <div class="contact-icon">
+                        <i class="bi bi-envelope"></i>
+                    </div>
+
+                    <div>
+                        <h4>Email</h4>
+                        <p class="contact-main">engage@um.edu.my</p>
+                        <p class="text-muted mb-0">
+                            Best for account issues, event application questions, and technical support.
+                        </p>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-md-6">
+                <a href="https://wa.me/60312345678?text=Hello%20UM%20Engage%20team%2C%20I%20need%20help%20with%20the%20UM%20Engage%20system."
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="contact-card text-decoration-none">
+                    <div class="contact-icon">
+                        <i class="bi bi-whatsapp"></i>
+                    </div>
+
+                    <div>
+                        <h4>WhatsApp</h4>
+                        <p class="contact-main">+60 3-1234 5678</p>
+                        <p class="text-muted mb-0">
+                            Best for urgent questions during office hours.
+                        </p>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-12">
+                <a href="https://www.google.com/maps/search/?api=1&query=Student%20Affairs%20Office%20Universiti%20Malaya"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="contact-card contact-card-wide text-decoration-none">
+                    <div class="contact-icon">
+                        <i class="bi bi-geo-alt"></i>
+                    </div>
+
+                    <div>
+                        <h4>Student Affairs Office</h4>
+                        <p class="contact-main">
+                            Universiti Malaya, 50603 Kuala Lumpur
+                        </p>
+                        <p class="text-muted mb-0">
+                            Walk-in hours: Monday to Friday, 9.00 am to 5.00 pm.
+                        </p>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="contact-note mt-4">
+            <div class="d-flex gap-3 align-items-start">
+                <div class="note-icon">
+                    <i class="bi bi-info-circle"></i>
+                </div>
+
+                <div>
+                    <h5 class="fw-bold mb-1">For faster support</h5>
+                    <p class="text-muted mb-0">
+                        Include your full name, registered email, and a short description of the issue.
+                        For event-related questions, mention the event title as well.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<style>
+    .contact-hero {
+        padding: 90px 0;
+        background:
+            linear-gradient(90deg, rgba(7, 29, 56, 0.96), rgba(11, 42, 80, 0.74)),
+            url('{{ contact_banner }}');
+        background-size: cover;
+        background-position: center;
+    }
+
+    .text-white-75 {
+        color: rgba(255, 255, 255, 0.82);
+    }
+
+    .contact-card {
+        background: #fffdf8;
+        border: 1px solid #ddd3c3;
+        border-radius: 20px;
+        padding: 28px;
+        min-height: 155px;
+        height: 100%;
+        display: flex;
+        align-items: flex-start;
+        gap: 18px;
+        color: #111827;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+        transition: 0.22s ease;
+    }
+
+    .contact-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 18px 38px rgba(15, 23, 42, 0.10);
+        color: #111827;
+        border-color: #d2c2aa;
+    }
+
+    .contact-card-wide {
+        min-height: 145px;
+    }
+
+    .contact-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        background: #f1ece3;
+        color: var(--um-blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .contact-card h4 {
+        font-family: Georgia, "Times New Roman", serif;
+        font-weight: 700;
+        color: var(--um-blue);
+        margin-bottom: 6px;
+    }
+
+    .contact-main {
+        color: #374151;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+
+    .contact-note {
+        background: #eef5ff;
+        border: 1px solid #cfe0ff;
+        border-radius: 18px;
+        padding: 22px;
+        color: var(--um-blue);
+    }
+
+    .note-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .contact-hero {
+            padding: 60px 0;
+        }
+
+        .contact-card {
+            padding: 22px;
+        }
+    }
+</style>
+
+{% endblock %}

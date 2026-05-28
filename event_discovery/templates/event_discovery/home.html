@@ -1,0 +1,413 @@
+{% extends "event_discovery/public_base.html" %}
+{% load static %}
+
+{% block content %}
+
+<section class="hero-section position-relative overflow-hidden">
+    <div id="heroCarousel"
+         class="carousel slide carousel-fade position-absolute top-0 start-0 w-100 h-100"
+         data-bs-ride="carousel"
+         data-bs-interval="3500">
+
+        <div class="carousel-inner h-100">
+            <<div class="carousel-item active h-100">
+                <div class="hero-slide" style="background-image: url('{% static 'event_discovery/images/banner1.png' %}');"></div>
+            </div>
+            <div class="carousel-item h-100">
+                <div class="hero-slide" style="background-image: url('{% static 'event_discovery/images/banner2.png' %}');"></div>
+            </div>
+            <div class="carousel-item h-100">
+                <div class="hero-slide" style="background-image: url('{% static 'event_discovery/images/banner3.jpg' %}');"></div>
+            </div>
+            <div class="carousel-item h-100">
+                <div class="hero-slide" style="background-image: url('{% static 'event_discovery/images/banner4.png' %}');"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100"></div>
+
+    <div class="container position-relative hero-content">
+        <div class="row align-items-center min-vh-75 py-5">
+            <div class="col-lg-7">
+                <div class="eyebrow mb-3">Universiti Malaya · Student Engagement</div>
+
+                <h1 class="display-3 display-title text-white mb-4">
+                    Discover campus events. Build skills that last.
+                </h1>
+
+                <p class="lead text-white-75 mb-4 hero-text">
+                    UM Engage helps students explore workshops, seminars, volunteer drives,
+                    and competitions while giving organizers a simpler way to manage events
+                    and applications.
+                </p>
+
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{% url 'event_discovery:event_list' %}" class="btn btn-um btn-lg">
+                        Browse Events <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'accounts:profile' %}" class="btn btn-light btn-lg rounded-3 fw-bold">
+                            Go to Profile
+                        </a>
+                    {% else %}
+                        <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg rounded-3 fw-bold">
+                            Create an Account
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-lg-5 mt-5 mt-lg-0">
+                <div class="hero-info-card">
+                    <h5 class="fw-bold mb-3">For Students</h5>
+                    <p class="mb-2">· Find events that match your interests and skills</p>
+                    <p class="mb-2">· Apply and track your approval status</p>
+                    <p class="mb-0">· Earn points and build your skill record</p>
+
+                    <hr>
+
+                    <h5 class="fw-bold mb-3">For Organizers</h5>
+                    <p class="mb-2">· Publish events and manage applications</p>
+                    <p class="mb-2">· Approve or reject applicants</p>
+                    <p class="mb-0">· Track attendance after events</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="stats-strip">
+    <div class="container">
+        <div class="row g-0 text-center">
+            <div class="col-md-4 stat-box">
+                <i class="bi bi-calendar-event text-gold fs-4"></i>
+                <h2 class="mt-2 mb-0">120+</h2>
+                <small>Events this semester</small>
+            </div>
+
+            <div class="col-md-4 stat-box">
+                <i class="bi bi-people text-gold fs-4"></i>
+                <h2 class="mt-2 mb-0">3,400</h2>
+                <small>Student members</small>
+            </div>
+
+            <div class="col-md-4 stat-box">
+                <i class="bi bi-award text-gold fs-4"></i>
+                <h2 class="mt-2 mb-0">60+</h2>
+                <small>Skills tracked</small>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-soft py-5" id="featured-events">
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <div class="eyebrow mb-2">What's On</div>
+                <h2 class="display-title mb-0">Featured opportunities</h2>
+            </div>
+
+            <a href="{% url 'event_discovery:event_list' %}" class="text-decoration-none fw-bold" style="color: var(--um-blue);">
+                View all <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            {% for event in featured_events %}
+            <div class="col-md-4">
+                <div class="event-card overflow-hidden position-relative">
+                    <div class="event-card-image-wrapper">
+                        {% if event.event_image %}
+                            <div class="event-card-image"
+                                 style="background-image: url('{{ event.event_image.url }}');"></div>
+                        {% else %}
+                            <div class="event-card-image"
+                                 style="background-image: url('{{ banner1 }}');"></div>
+                        {% endif %}
+
+                        <div class="event-card-image-overlay"></div>
+
+                        <div class="event-card-top-content">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="category-badge category-{{ event.event_category|lower }}">
+                                    {{ event.event_category }}
+                                </span>
+                                {% if request.user.is_authenticated and request.user.profile.role == 'Student' %}
+                                <form method="POST"
+                                    action="{% url 'event_discovery:toggle_saved_event' event.id %}"
+                                    class="save-event-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ request.get_full_path }}#featured-events">
+                                    <button type="submit"
+                                            class="save-event-btn {% if event.is_saved %}saved{% endif %}"
+                                            title="{% if event.is_saved %}Remove from saved events{% else %}Save event{% endif %}">
+                                        {% if event.is_saved %}
+                                            <i class="bi bi-bookmark-fill"></i>
+                                        {% else %}
+                                            <i class="bi bi-bookmark"></i>
+                                        {% endif %}
+                                    </button>
+                                </form>
+                            {% else %}
+                                <a href="{% url 'accounts:login' %}" class="save-event-btn" title="Login to save event">
+                                    <i class="bi bi-bookmark"></i>
+                                </a>
+                            {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4">
+                        <h4 class="fw-bold mb-3 event-card-title">
+                            {{ event.event_title }}
+                        </h4>
+
+                        <p class="text-muted mb-3">
+                            {{ event.event_description|truncatechars:90 }}
+                        </p>
+
+                        <div class="small text-muted mb-2">
+                            <i class="bi bi-calendar-event me-2"></i>
+                            {{ event.event_date|date:"d M Y" }}
+                        </div>
+
+                        <div class="small text-muted mb-3">
+                            <i class="bi bi-geo-alt me-2"></i>
+                            {{ event.event_location }}
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between align-items-end flex-wrap gap-2">
+                            <div>
+                                {% for skill in event.skill_list|slice:":3" %}
+                                    <span class="skill-pill">{{ skill }}</span>
+                                {% empty %}
+                                    <span class="skill-pill">General</span>
+                                {% endfor %}
+                            </div>
+
+                            <span class="fw-bold points-text">
+                                +{{ event.points_awarded }} pts
+                            </span>
+                        </div>
+                    </div>
+                    <a href="{% url 'event_discovery:event_detail' event.id %}" class="stretched-link"></a>
+                </div>
+
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="text-center bg-white border rounded-4 p-5">
+                    <i class="bi bi-calendar-x fs-1 text-muted"></i>
+                    <h4 class="fw-bold mt-3">No approved events yet</h4>
+                    <p class="text-muted mb-0">
+                        Once organizers create events and admins approve them, they will appear here.
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<style>
+    .hero-section {
+        min-height: 690px;
+        border-bottom: 1px solid #e4dac9;
+    }
+
+    .min-vh-75 {
+        min-height: 690px;
+    }
+
+    .hero-slide {
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .hero-overlay {
+        background:
+            linear-gradient(
+                90deg,
+                rgba(7, 29, 56, 0.88),
+                rgba(11, 42, 80, 0.62),
+                rgba(217, 154, 43, 0.18)
+            ),
+            linear-gradient(
+                180deg,
+                rgba(0, 0, 0, 0.20),
+                rgba(0, 0, 0, 0.25)
+            );
+        z-index: 1;
+    }
+
+    .hero-content {
+        z-index: 2;
+    }
+
+    .text-white-75 {
+        color: rgba(255, 255, 255, 0.82);
+    }
+
+    .hero-text {
+        max-width: 720px;
+        line-height: 1.75;
+    }
+
+    .hero-info-card {
+        background: rgba(255, 250, 242, 0.90);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.45);
+        border-radius: 18px;
+        padding: 28px;
+        color: #142033;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.16);
+    }
+
+    .hero-info-card h5 {
+        color: var(--um-blue);
+        font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .stats-strip {
+        background: #fffaf2;
+        border-bottom: 1px solid #e4dac9;
+    }
+
+    .stat-box {
+        padding: 32px 20px;
+        border-right: 1px solid #e4dac9;
+    }
+
+    .stat-box:last-child {
+        border-right: 0;
+    }
+
+    .stat-box h2 {
+        font-family: Georgia, "Times New Roman", serif;
+        color: #0f172a;
+        font-weight: 700;
+    }
+
+    .stat-box small {
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #5b6472;
+    }
+
+    .text-gold {
+        color: var(--um-gold);
+    }
+
+    .event-card {
+        border: 1px solid #ddd3c3;
+        border-radius: 18px;
+        background: #fffdf8;
+        transition: 0.25s ease;
+        height: 100%;
+        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+    }
+
+    .event-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 16px 35px rgba(15, 23, 42, 0.10);
+    }
+
+    .event-card-image-wrapper {
+        position: relative;
+        height: 180px;
+        overflow: hidden;
+        border-bottom: 1px solid #e8decd;
+    }
+
+    .event-card-image {
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .event-card-image-overlay {
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(
+                to bottom,
+                rgba(11, 42, 80, 0.18),
+                rgba(11, 42, 80, 0.50)
+            );
+    }
+
+    .event-card-top-content {
+        position: absolute;
+        inset: 0;
+        padding: 16px 18px;
+        z-index: 2;
+    }
+
+    .event-card-title {
+        font-family: Georgia, "Times New Roman", serif;
+        color: #0f172a;
+        line-height: 1.25;
+    }
+
+    .category-badge {
+        background: rgba(255, 248, 236, 0.92);
+        color: var(--um-blue);
+        border-radius: 10px;
+        padding: 7px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+    }
+
+    .skill-pill {
+        background: #f1ece3;
+        color: #4b5563;
+        border-radius: 8px;
+        padding: 6px 10px;
+        font-size: 12px;
+        display: inline-block;
+        margin-right: 5px;
+        margin-bottom: 5px;
+    }
+
+    .points-text {
+        color: var(--um-gold);
+        font-size: 1.1rem;
+    }
+
+    .save-event-form,
+    .save-event-btn {
+        position: relative;
+        z-index: 5;
+    }
+
+    @media (max-width: 768px) {
+        .hero-section,
+        .min-vh-75 {
+            min-height: auto;
+        }
+
+        .hero-section {
+            padding: 40px 0;
+        }
+
+        .display-title {
+            font-size: 2.4rem;
+        }
+
+        .stat-box {
+            border-right: 0;
+            border-bottom: 1px solid #e4dac9;
+        }
+    }
+</style>
+
+{% endblock %}

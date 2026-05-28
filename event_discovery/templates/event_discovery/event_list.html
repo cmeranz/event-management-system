@@ -1,0 +1,369 @@
+{% extends "event_discovery/public_base.html" %}
+{% load static %}
+
+{% static "event_discovery/images/banner1.png" as fallback_image %}
+
+{% block content %}
+
+<section class="events-hero">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-7">
+                <div class="eyebrow mb-3">Explore Opportunities</div>
+                <h1 class="display-title text-white mb-3">
+                    Find events that match your goals.
+                </h1>
+                <p class="lead text-white-75 mb-0">
+                    Search workshops, seminars, volunteering activities, and competitions approved by UM Engage.
+                </p>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="events-hero-card">
+                    <h5 class="fw-bold mb-2">Event Types</h5>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <span class="category-badge category-workshop">Workshop</span>
+                        <span class="category-badge category-seminar">Seminar</span>
+                        <span class="category-badge category-volunteer">Volunteer</span>
+                        <span class="category-badge category-competition">Competition</span>
+                    </div>
+                    <small class="text-muted">
+                        Points and skills are awarded after attendance is confirmed.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-soft py-5"  id="events-section">
+    <div class="container py-3">
+
+        <div class="card filter-card mb-4">
+            <div class="card-body p-4">
+                <form method="GET" action="{% url 'event_discovery:event_list' %}" class="row g-3 align-items-end">
+
+                    <div class="col-lg-4">
+                        <label class="form-label fw-semibold">Search</label>
+                        <input type="text"
+                               name="search"
+                               class="form-control"
+                               placeholder="Search by title, location, or description"
+                               value="{{ search_query }}">
+                    </div>
+
+                    <div class="col-lg-3">
+                        <label class="form-label fw-semibold">Category</label>
+                        <select name="category" class="form-select">
+                            <option value="">All Categories</option>
+                            {% for category in categories %}
+                                <option value="{{ category }}"
+                                    {% if category_filter == category %}selected{% endif %}>
+                                    {{ category }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-lg-3">
+                        <label class="form-label fw-semibold">Skill</label>
+                        <input type="text"
+                               name="skill"
+                               class="form-control"
+                               placeholder="Example: Python"
+                               value="{{ skill_filter }}">
+                    </div>
+
+                    <div class="col-lg-2 d-flex gap-2">
+                        <button type="submit" class="btn btn-um w-100">
+                            <i class="bi bi-search me-1"></i>Filter
+                        </button>
+                    </div>
+
+                    {% if search_query or category_filter or skill_filter %}
+                    <div class="col-12">
+                        <a href="{% url 'event_discovery:event_list' %}" class="small-link">
+                            Clear filters
+                        </a>
+                    </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <div class="eyebrow mb-2">Approved Events</div>
+                <h2 class="display-title mb-0">Available opportunities</h2>
+            </div>
+            <span class="text-muted fw-semibold">{{ events|length }} event(s) found</span>
+        </div>
+
+        <div class="row g-4">
+            {% for event in events %}
+            <div class="col-md-6 col-xl-4">
+                <div class="event-card overflow-hidden">
+
+                    <div class="event-card-image-wrapper">
+                        {% if event.event_image %}
+                            <div class="event-card-image"
+                                 style="background-image: url('{{ event.event_image.url }}');"></div>
+                        {% else %}
+                            <div class="event-card-image"
+                                 style="background-image: url('{{ fallback_image }}');"></div>
+                        {% endif %}
+
+                        <div class="event-card-image-overlay"></div>
+
+                        <div class="event-card-top-content">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="category-badge category-{{ event.event_category|lower }}">
+                                    {{ event.event_category }}
+                                </span>
+                                {% if request.user.is_authenticated and request.user.profile.role == 'Student' %}
+                                <form method="POST"
+                                    action="{% url 'event_discovery:toggle_saved_event' event.id %}"
+                                    class="save-event-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ request.get_full_path }}#events-section">
+                                    <button type="submit"
+                                            class="save-event-btn {% if event.is_saved %}saved{% endif %}"
+                                            title="{% if event.is_saved %}Remove from saved events{% else %}Save event{% endif %}">
+                                        {% if event.is_saved %}
+                                            <i class="bi bi-bookmark-fill"></i>
+                                        {% else %}
+                                            <i class="bi bi-bookmark"></i>
+                                        {% endif %}
+                                    </button>
+                                </form>
+                            {% else %}
+                                <a href="{% url 'accounts:login' %}" class="save-event-btn" title="Login to save event">
+                                    <i class="bi bi-bookmark"></i>
+                                </a>
+                            {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4">
+                        <h4 class="fw-bold mb-3 event-card-title">
+                            {{ event.event_title }}
+                        </h4>
+
+                        <p class="text-muted mb-3">
+                            {{ event.event_description|truncatechars:100 }}
+                        </p>
+
+                        <div class="small text-muted mb-2">
+                            <i class="bi bi-calendar-event me-2"></i>
+                            {{ event.event_date|date:"d M Y" }}
+                        </div>
+
+                        <div class="small text-muted mb-3">
+                            <i class="bi bi-geo-alt me-2"></i>
+                            {{ event.event_location }}
+                        </div>
+
+                        <hr>
+
+                        <div class="mb-3">
+                            {% for skill in event.skill_list|slice:":3" %}
+                                <span class="skill-pill">{{ skill }}</span>
+                            {% empty %}
+                                <span class="skill-pill">General</span>
+                            {% endfor %}
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'event_discovery:event_detail' event.id %}" class="btn btn-outline-um flex-fill">
+                                View Details
+                            </a>
+
+                            {% if request.user.is_authenticated and request.user.profile.role == 'Student' %}
+                                <a href="{% url 'event_applications:apply_event' event.id %}" class="btn btn-um flex-fill">
+                                    Apply
+                                </a>
+                            {% elif request.user.is_authenticated %}
+                                <button class="btn btn-light border flex-fill" disabled>
+                                    Apply
+                                </button>
+                            {% else %}
+                                <a href="{% url 'accounts:login' %}" class="btn btn-um flex-fill">
+                                    Login to Apply
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="text-center bg-white border rounded-4 p-5">
+                    <i class="bi bi-search fs-1 text-muted"></i>
+                    <h4 class="fw-bold mt-3">No events found</h4>
+                    <p class="text-muted mb-0">
+                        Try a different search keyword, category, or skill.
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>
+
+<style>
+    .events-hero {
+        position: relative;
+        padding: 90px 0;
+        background:
+            linear-gradient(90deg, rgba(7, 29, 56, 0.94), rgba(11, 42, 80, 0.76)),
+            url('{{ fallback_image }}');
+        background-size: cover;
+        background-position: center;
+    }
+
+    .text-white-75 {
+        color: rgba(255, 255, 255, 0.82);
+    }
+
+    .events-hero-card {
+        background: rgba(255, 250, 242, 0.92);
+        border: 1px solid rgba(255, 255, 255, 0.45);
+        border-radius: 18px;
+        padding: 26px;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.14);
+    }
+
+    .events-hero-card h5 {
+        color: var(--um-blue);
+        font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .filter-card {
+        border: 1px solid #ddd3c3;
+        border-radius: 18px;
+        background: #fffdf8;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 12px;
+        padding: 11px 13px;
+        border-color: #d8cdbb;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--um-blue);
+        box-shadow: 0 0 0 0.18rem rgba(11, 42, 80, 0.12);
+    }
+
+    .small-link {
+        color: var(--um-blue);
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .small-link:hover {
+        text-decoration: underline;
+    }
+
+    .event-card {
+        border: 1px solid #ddd3c3;
+        border-radius: 18px;
+        background: #fffdf8;
+        transition: 0.25s ease;
+        height: 100%;
+        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+    }
+
+    .event-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 16px 35px rgba(15, 23, 42, 0.10);
+    }
+
+    .event-card-image-wrapper {
+        position: relative;
+        height: 180px;
+        overflow: hidden;
+        border-bottom: 1px solid #e8decd;
+    }
+
+    .event-card-image {
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .event-card-image-overlay {
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(to bottom, rgba(11, 42, 80, 0.18), rgba(11, 42, 80, 0.55));
+    }
+
+    .event-card-top-content {
+        position: absolute;
+        inset: 0;
+        padding: 16px 18px;
+        z-index: 2;
+    }
+
+    .event-card-title {
+        font-family: Georgia, "Times New Roman", serif;
+        color: #0f172a;
+        line-height: 1.25;
+    }
+
+    .category-badge {
+        background: rgba(255, 248, 236, 0.94);
+        color: var(--um-blue);
+        border-radius: 10px;
+        padding: 7px 12px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .points-image-badge {
+        background: rgba(217, 154, 43, 0.94);
+        color: white;
+        border-radius: 10px;
+        padding: 7px 12px;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .skill-pill {
+        background: #f1ece3;
+        color: #4b5563;
+        border-radius: 8px;
+        padding: 6px 10px;
+        font-size: 12px;
+        display: inline-block;
+        margin-right: 5px;
+        margin-bottom: 5px;
+    }
+
+    .save-event-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    background: rgba(255, 255, 255, 0.88);
+    color: var(--um-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s ease;
+    }
+
+    .save-event-btn:hover {
+        background: white;
+        transform: translateY(-2px);
+    }
+</style>
+
+{% endblock %}

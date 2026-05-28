@@ -19,9 +19,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
 urlpatterns = [
+    path('', include('event_discovery.urls')),
 path('admin/', admin.site.urls),
     path('', include('core.urls')),
-]
+    path('organizer/', include('organizer.urls')),
+    path('accounts/', include('accounts.urls')),
+    path('applications/', include('event_applications.urls')),
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # This allows your browser to see the images while you are developing
 if settings.DEBUG:

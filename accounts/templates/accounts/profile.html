@@ -1,0 +1,478 @@
+{% extends "event_discovery/public_base.html" %}
+{% load static %}
+
+{% block content %}
+
+<section class="profile-hero">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3">
+            <div>
+                <div class="eyebrow mb-2">My Profile</div>
+                <h1 class="display-title text-white mb-2">
+                    Welcome back, {{ request.user.first_name|default:request.user.username }}.
+                </h1>
+                <p class="text-white-75 mb-0">
+                    Track your applications, participation, points, and skills.
+                </p>
+            </div>
+
+            <a href="{% url 'event_discovery:event_list' %}" class="btn btn-light rounded-3 fw-bold">
+                Browse Events
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="section-soft py-5">
+    <div class="container py-4">
+
+        <!-- Summary Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6 col-xl-3">
+                <div class="profile-card p-4">
+                    <div class="profile-icon">
+                        <i class="bi bi-award"></i>
+                    </div>
+                    <small class="text-muted fw-bold">CURRENT BADGE</small>
+                    <h5 class="fw-bold mt-2 mb-2">{{ current_milestone.title }}</h5>
+
+                    {% if next_milestone %}
+                        <small class="text-muted">
+                            {{ points_needed }} pts needed for {{ next_milestone.title }}
+                        </small>
+                    {% else %}
+                        <small class="text-muted">Maximum milestone reached</small>
+                    {% endif %}
+
+                    <div class="progress mt-3" style="height: 8px;">
+                        <div class="progress-bar" style="width: {{ progress_percent }}%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="profile-card p-4">
+                    <div class="profile-icon gold">
+                        <i class="bi bi-stars"></i>
+                    </div>
+                    <h2 class="fw-bold mb-0">{{ total_points }}</h2>
+                    <small class="text-muted fw-bold">ENGAGEMENT POINTS</small>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="profile-card p-4">
+                    <div class="profile-icon green">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                    <h2 class="fw-bold mb-0">{{ attended_count }}</h2>
+                    <small class="text-muted fw-bold">EVENTS ATTENDED</small>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="profile-card p-4">
+                    <div class="profile-icon purple">
+                        <i class="bi bi-lightbulb"></i>
+                    </div>
+                    <h2 class="fw-bold mb-0">{{ gained_skills|length }}</h2>
+                    <small class="text-muted fw-bold">SKILLS GAINED</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-card mb-5">
+    <div class="card-header bg-white fw-bold py-3 px-4">
+    Badge Roadmap
+</div>
+
+    <div class="row g-0">
+        {% for milestone in milestones %}
+        <div class="col-md">
+            <div class="milestone-box {% if total_points >= milestone.points %}active{% endif %}">
+                
+                <div class="milestone-main">
+                    <div class="milestone-icon-circle">
+                        <i class="bi {{ milestone.icon }}"></i>
+                    </div>
+
+                    <div class="milestone-content">
+                        <strong>{{ milestone.title }}</strong>
+                        <small>{{ milestone.points }} pts</small>
+                    </div>
+                </div>
+
+                <div class="milestone-status">
+                    {% if total_points >= milestone.points %}
+                        <span class="milestone-status-badge unlocked">
+                            <i class="bi bi-check-lg"></i>
+                        </span>
+                    {% else %}
+                        <span class="milestone-status-badge locked">
+                            <i class="bi bi-lock"></i>
+                        </span>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+        <!-- Main Content -->
+        <div class="row g-4">
+
+            <!-- Applications -->
+            <div class="col-lg-8">
+                <div class="d-flex justify-content-between align-items-end mb-3">
+                    <div>
+                        <div class="eyebrow mb-1">Applications</div>
+                        <h3 class="display-title mb-0">My Applications</h3>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="text-muted fw-semibold">{{ total_applications }} total</span>
+                        <a href="{% url 'event_applications:my_applications' %}"
+                        class="btn btn-sm btn-outline-um">
+                            View All
+                        </a>
+                    </div>
+                </div>
+
+                <div class="profile-card">
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th class="ps-4 py-3">Event</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Submitted</th>
+                                <th class="text-end pe-4">Action</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {% for app in applications %}
+                                {% if app.application_event %}
+                                    {% with event=app.application_event %}
+                                        {% include "accounts/profile_application_row.html" %}
+                                    {% endwith %}
+                                {% elif app.event_ID %}
+                                    {% with event=app.event_ID %}
+                                        {% include "accounts/profile_application_row.html" %}
+                                    {% endwith %}
+                                {% endif %}
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    You have not applied for any events yet.
+                                    <a href="{% url 'event_discovery:event_list' %}" class="fw-bold" style="color: var(--um-blue);">
+                                        Browse events
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile and Skills -->
+            <div class="col-lg-4">
+                <div class="profile-card p-4 mb-4">
+                    <div class="eyebrow mb-2">Account</div>
+                    <h4 class="fw-bold mb-3">Profile Details</h4>
+
+                    <div class="profile-detail-row">
+                        <span>Name</span>
+                        <strong>{{ request.user.get_full_name|default:request.user.username }}</strong>
+                    </div>
+
+                    <div class="profile-detail-row">
+                        <span>Email</span>
+                        <strong>{{ request.user.email }}</strong>
+                    </div>
+
+                    <div class="profile-detail-row">
+                        <span>Role</span>
+                        <strong>{{ profile.role }}</strong>
+                    </div>
+
+                    {% if profile.student_staff_id %}
+                    <div class="profile-detail-row">
+                        <span>Student/Staff ID</span>
+                        <strong>{{ profile.student_staff_id }}</strong>
+                    </div>
+                    {% endif %}
+
+                    <a href="{% url 'accounts:edit_profile' %}" class="btn btn-outline-um w-100 mt-3">
+                        Edit Profile
+                    </a>
+                </div>
+                <div class="profile-card p-4 mb-4" id="saved-events">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <div class="eyebrow mb-1">Saved</div>
+                        <h4 class="fw-bold mb-0">Saved Events</h4>
+                    </div>
+                    <span class="text-muted fw-semibold">{{ saved_events_count }}</span>
+                </div>
+
+                {% for saved in saved_events %}
+                    <div class="saved-event-item">
+                        <div>
+                            <strong>{{ saved.event.event_title }}</strong>
+                            <small class="text-muted d-block">
+                                {{ saved.event.event_date|date:"d M Y" }} · {{ saved.event.event_category }}
+                            </small>
+                        </div>
+
+                        <a href="{% url 'event_discovery:event_detail' saved.event.id %}"
+                        class="btn btn-sm btn-outline-um">
+                            View
+                        </a>
+                    </div>
+                {% empty %}
+                    <p class="text-muted mb-0">
+                        No saved events yet. Use the bookmark icon on event cards to save events here.
+                    </p>
+                {% endfor %}
+            </div>
+                <div class="profile-card p-4">
+                    <div class="eyebrow mb-2">Skills</div>
+                    <h4 class="fw-bold mb-3">Skills Gained</h4>
+
+                    {% if gained_skills %}
+                        {% for skill in gained_skills %}
+                            <span class="skill-pill">{{ skill }}</span>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted mb-0">
+                            Attend approved events to start earning verified skill tags.
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<style>
+    .profile-hero {
+        padding: 80px 0;
+        background:
+            linear-gradient(90deg, rgba(7, 29, 56, 0.96), rgba(11, 42, 80, 0.72)),
+            url("{% static 'event_discovery/images/banner1.png' %}");
+        background-size: cover;
+        background-position: center;
+    }
+
+    .text-white-75 {
+        color: rgba(255, 255, 255, 0.82);
+    }
+
+    .profile-card {
+        background: #fffdf8;
+        border: 1px solid #ddd3c3;
+        border-radius: 18px;
+        box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);
+        overflow: hidden;
+    }
+
+    .profile-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        background: #eef5ff;
+        color: var(--um-blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 14px;
+        font-size: 20px;
+    }
+
+    .profile-icon.gold {
+        background: #fff4d8;
+        color: #8a5a00;
+    }
+
+    .profile-icon.green {
+        background: #e7f7ef;
+        color: #146c43;
+    }
+
+    .profile-icon.purple {
+        background: #f5e8ff;
+        color: #6f2da8;
+    }
+
+    .progress-bar {
+        background: var(--um-blue);
+    }
+
+    .milestone-box {
+    padding: 18px 20px;
+    border-right: 1px solid #eadfce;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 100px;
+    color: #9ca3af;
+    background: #fffdf8;
+    transition: 0.2s ease;
+}
+
+.milestone-box.active {
+    color: #111827;
+    background: #fffaf2;
+}
+
+.milestone-main {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+}
+
+.milestone-icon-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    background: #f1f5f9;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 18px;
+}
+
+.milestone-box.active .milestone-icon-circle {
+    background: #eef5ff;
+    color: var(--um-blue);
+}
+
+.milestone-content strong {
+    display: block;
+    font-size: 15px;
+    line-height: 1.2;
+    margin-bottom: 3px;
+}
+
+.milestone-content small {
+    display: block;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.milestone-status {
+    margin-left: 12px;
+    flex-shrink: 0;
+}
+
+.milestone-status-badge {
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+}
+
+.milestone-status-badge.unlocked {
+    background: #e7f7ef;
+    color: #146c43;
+    border: 1px solid #b7e4cd;
+}
+
+.milestone-status-badge.locked {
+    background: #f1f5f9;
+    color: #94a3b8;
+    border: 1px solid #dbe3ec;
+}
+
+    .status-pill {
+        border-radius: 999px;
+        padding: 7px 12px;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .status-pending {
+        background: #fff4d8;
+        color: #8a5a00;
+        border: 1px solid #f1d48a;
+    }
+
+    .status-approved {
+        background: #e7f7ef;
+        color: #146c43;
+        border: 1px solid #b7e4cd;
+    }
+
+    .status-rejected {
+        background: #fde8e8;
+        color: #b42318;
+        border: 1px solid #f7b4b4;
+    }
+
+    .profile-detail-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        border-bottom: 1px solid #eadfce;
+        padding: 12px 0;
+        font-size: 14px;
+    }
+
+    .profile-detail-row span {
+        color: #6b7280;
+    }
+
+    .profile-detail-row strong {
+        text-align: right;
+        color: #111827;
+    }
+
+    .skill-pill {
+        background: #f1ece3;
+        color: #4b5563;
+        border-radius: 8px;
+        padding: 6px 10px;
+        font-size: 12px;
+        display: inline-block;
+        margin-right: 5px;
+        margin-bottom: 5px;
+    }
+    .saved-event-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 12px 0;
+        border-bottom: 1px solid #eadfce;
+    }
+
+    .saved-event-item:last-child {
+        border-bottom: 0;
+    }
+
+    @media (max-width: 768px) {
+    .milestone-box {
+        border-right: 0;
+        border-bottom: 1px solid #eadfce;
+        min-height: auto;
+    }
+
+    .milestone-content strong {
+        font-size: 14px;
+    }
+}
+</style>
+
+{% endblock %}

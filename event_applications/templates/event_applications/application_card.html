@@ -1,0 +1,81 @@
+<div class="col-md-6 col-xl-4">
+    <div class="application-card">
+
+        <div class="application-image">
+            {% if event.event_image %}
+                <img src="{{ event.event_image.url }}" alt="{{ event.event_title }}">
+            {% else %}
+                <img src="{{ fallback_image }}" alt="{{ event.event_title }}">
+            {% endif %}
+
+            <div class="application-image-overlay"></div>
+
+            <div class="application-top">
+                <div class="d-flex justify-content-between align-items-start">
+                    <span class="category-badge category-{{ event.event_category|lower }}">
+                        {{ event.event_category }}
+                    </span>
+
+                    {% if app.attended %}
+                        <span class="status-pill status-attended">Attended</span>
+                    {% elif app.application_status == 'Pending' %}
+                        <span class="status-pill status-pending">Pending</span>
+                    {% elif app.application_status == 'Approved' %}
+                        <span class="status-pill status-approved">Approved</span>
+                    {% else %}
+                        <span class="status-pill status-rejected">Rejected</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4">
+            <h4 class="fw-bold event-card-title mb-2">
+                {{ event.event_title }}
+            </h4>
+
+            <div class="small text-muted mb-2">
+                <i class="bi bi-calendar-event me-2"></i>{{ event.event_date|date:"d M Y" }}
+            </div>
+
+            <div class="small text-muted mb-3">
+                <i class="bi bi-geo-alt me-2"></i>{{ event.event_location }}
+            </div>
+
+            {% if app.application_statement %}
+                <div class="bg-light border rounded-3 p-3 mb-3">
+                    <small class="text-muted d-block mb-1">Your statement</small>
+                    <span>{{ app.application_statement }}</span>
+                </div>
+            {% endif %}
+
+            <div class="mb-3">
+                {% for skill in event.skill_list|slice:":3" %}
+                    <span class="skill-pill">{{ skill }}</span>
+                {% empty %}
+                    <span class="skill-pill">General</span>
+                {% endfor %}
+            </div>
+
+            <div class="d-flex gap-2">
+                <a href="{% url 'event_discovery:event_detail' event.id %}" class="btn btn-outline-um flex-fill">
+                    View Event
+                </a>
+
+                {% if app.application_status == 'Pending' %}
+                    <a href="{% url 'event_applications:cancel_application' app.id %}" class="btn btn-outline-danger flex-fill">
+                        Cancel
+                    </a>
+                {% elif app.attended %}
+                    <button class="btn btn-light border flex-fill" disabled>
+                        Attended
+                    </button>
+                {% else %}
+                    <button class="btn btn-light border flex-fill" disabled>
+                        {{ app.application_status }}
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

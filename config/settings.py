@@ -38,6 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'organizer',
+    'accounts.apps.AccountsConfig',
+    'event_discovery',
+    'event_applications',
 ]
 
 MIDDLEWARE = [
@@ -124,3 +128,10 @@ MEDIA_URL = '/media/'
 
 # The actual folder on your computer where files will be saved
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+LOGIN_URL = 'accounts:login'
+LOGIN_REDIRECT_URL = 'accounts:redirect_dashboard'
+LOGOUT_REDIRECT_URL = 'accounts:login'
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'noreply@umengage.local'

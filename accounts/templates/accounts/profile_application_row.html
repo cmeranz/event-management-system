@@ -1,0 +1,37 @@
+<tr>
+    <td class="ps-4">
+        <div class="fw-bold">{{ event.event_title }}</div>
+        <small class="text-muted">{{ event.event_category }}</small>
+    </td>
+
+    <td>
+        {{ event.event_date|date:"d M Y" }}
+    </td>
+
+    <td>
+        {% if app.application_status == 'Pending' %}
+            <span class="status-pill status-pending">Pending</span>
+        {% elif app.application_status == 'Approved' %}
+            <span class="status-pill status-approved">Approved</span>
+        {% else %}
+            <span class="status-pill status-rejected">Rejected</span>
+        {% endif %}
+    </td>
+
+    <td>
+        <div>{{ app.application_applied_on|date:"d M Y" }}</div>
+        <small class="text-muted">{{ app.application_applied_on|time:"h:i A" }}</small>
+    </td>
+
+    <td class="text-end pe-4">
+        {% if app.application_status == 'Pending' %}
+            <a href="{% url 'event_applications:cancel_application' app.id %}" class="btn btn-sm btn-outline-danger">
+                Cancel
+            </a>
+        {% else %}
+            <a href="{% url 'event_discovery:event_detail' event.id %}" class="btn btn-sm btn-outline-um">
+                View
+            </a>
+        {% endif %}
+    </td>
+</tr>

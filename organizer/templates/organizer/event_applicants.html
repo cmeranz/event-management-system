@@ -1,0 +1,142 @@
+{% extends "organizer/organizer_base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="page-title mb-1">Applicants</h2>
+        <p class="text-muted mb-0">{{ event.event_title }}</p>
+    </div>
+
+    <a href="{% url 'organizer:events' %}" class="btn btn-light border">
+        <i class="bi bi-arrow-left me-2"></i>Back to Events
+    </a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card soft-card p-3">
+            <small class="text-muted fw-bold">TOTAL APPLICANTS</small>
+            <h3 class="mb-0">{{ applications|length }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card soft-card p-3 border-start border-primary border-4">
+            <small class="text-muted fw-bold">EVENT CAPACITY</small>
+            <h3 class="mb-0">{{ event.event_capacity }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card soft-card p-3 border-start border-success border-4">
+            <small class="text-muted fw-bold">EVENT STATUS</small>
+            <h5 class="mb-0">{{ event.event_approval_status }}</h5>
+        </div>
+    </div>
+</div>
+
+<div class="card soft-card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+            <tr>
+                <th class="ps-4 py-3">Student</th>
+                <th>Statement</th>
+                <th>Applied On</th>
+                <th>Status</th>
+                <th>Attendance</th>
+                <th class="text-end pe-4">Actions</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for app in applications %}
+            <tr>
+                <td class="ps-4">
+                    <div class="fw-bold">
+                        {{ app.application_applicant.get_full_name|default:app.application_applicant.username }}
+                    </div>
+                    <small class="text-muted">{{ app.application_applicant.email }}</small>
+                </td>
+
+                <td style="max-width: 350px;">
+                    <span class="text-muted">
+                        {{ app.application_statement|default:"No statement provided." }}
+                    </span>
+                </td>
+
+                <td>
+                    <div>{{ app.application_applied_on|date:"M d, Y" }}</div>
+                    <small class="text-muted">{{ app.application_applied_on|time:"h:i A" }}</small>
+                </td>
+
+                <td>
+                    {% if app.application_status == 'Pending' %}
+                    <span class="status-badge bg-warning-subtle text-warning">Pending</span>
+                    {% elif app.application_status == 'Approved' %}
+                    <span class="status-badge bg-success-subtle text-success">Approved</span>
+                    {% else %}
+                    <span class="status-badge bg-danger-subtle text-danger">Rejected</span>
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if app.application_status == 'Approved' %}
+                        {% if app.attended %}
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
+                                    <i class="bi bi-check-circle me-1"></i>Attended
+                                </span>
+
+                                <a href="{% url 'organizer:update_attendance' app.id 'not_attended' %}"
+                                class="btn btn-sm btn-outline-secondary">
+                                    Undo
+                                </a>
+                            </div>
+                        {% else %}
+                            <a href="{% url 'organizer:update_attendance' app.id 'attended' %}"
+                            class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-check2-circle me-1"></i>Mark Attended
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <span class="badge bg-light text-muted border px-3 py-2">
+                            Not available
+                        </span>
+                    {% endif %}
+                </td>
+                <td class="text-end pe-4">
+                {% if app.application_status == 'Pending' %}
+                <div class="btn-group">
+                    <form action="{% url 'organizer:update_applicant_status' app.id 'Approved' %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-success">
+                            Approve
+                        </button>
+                    </form>
+
+                    <form action="{% url 'organizer:update_applicant_status' app.id 'Rejected' %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger">
+                            Reject
+                        </button>
+                    </form>
+                </div>
+                {% else %}
+                <span class="text-muted small">Processed</span>
+                {% endif %}
+            </td>
+            </tr>
+            {% empty %}
+            <tr>
+               <td colspan="6" class="text-center py-5 text-muted">
+                    <i class="bi bi-people fs-1 d-block mb-2"></i>
+                    No students have applied for this event yet.
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

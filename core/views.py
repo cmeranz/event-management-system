@@ -1,22 +1,29 @@
 import datetime
 from datetime import time, timedelta
+from django.views.decorators.cache import never_cache
+from accounts.decorators import admin_required
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.db.models import Q
 from .models import Event, Application
 
 # --- General Navigation ---
-
+@admin_required
+@never_cache
 def admin_dashboard(request):
     return render(request, 'admin_dashboard.html')
 
 # --- Event Management Module ---
-
+@admin_required
+@never_cache
 def admin_events(request):
     # Fetch all events and send to the template
     all_events = Event.objects.all().order_by('-event_date')
     return render(request, 'admin_events.html', {'events': all_events})
 
+@admin_required
+@never_cache
 def update_event_status(request, event_id):
     if request.method == 'POST':
         event = get_object_or_404(Event, id=event_id)
@@ -27,7 +34,8 @@ def update_event_status(request, event_id):
     return redirect('admin_events')
 
 # --- Applications Module (Filters & Stats) ---
-
+@admin_required
+@never_cache
 def admin_applications(request):
     # 1. Setup basic time variables for KL
     today_date = timezone.now().date()
@@ -89,7 +97,8 @@ def admin_applications(request):
     return render(request, 'admin_applications.html', context)
 
 # --- Application Logic ---
-
+@admin_required
+@never_cache
 def update_application_status(request, pk, status):
     if request.method == 'POST':
         application = get_object_or_404(Application, pk=pk)
@@ -102,7 +111,8 @@ import csv
 from django.http import HttpResponse
 from django.utils import timezone  # Import this!
 
-
+@admin_required
+@never_cache
 def export_applications_csv(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="event_applications_KL.csv"'
@@ -132,7 +142,8 @@ def export_applications_csv(request):
 # --- Admin Dashboard ---
 from django.db.models import Count
 
-
+@admin_required
+@never_cache
 def admin_dashboard(request):
     # 1. Application Status Data (Doughnut Chart)
     status_counts = Application.objects.values('application_status').annotate(total=Count('id'))

@@ -1,0 +1,110 @@
+{% extends "organizer/organizer_base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="page-title mb-1">{{ title }}</h2>
+        <p class="text-muted mb-0">Submitted events will be reviewed by the admin before they become visible.</p>
+    </div>
+
+    <a href="{% url 'organizer:events' %}" class="btn btn-light border">
+        <i class="bi bi-arrow-left me-2"></i>Back to Events
+    </a>
+</div>
+
+<div class="card soft-card">
+    <div class="card-body p-4">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {% if form.errors %}
+            <div class="alert alert-danger">
+                Please check the form and correct the highlighted fields.
+            </div>
+            {% endif %}
+
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label class="form-label fw-semibold">Event Title</label>
+                    {{ form.event_title }}
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Category</label>
+                    {{ form.event_category }}
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Event Date</label>
+                    {{ form.event_date }}
+                </div>
+
+                <div class="col-md-8">
+                    <label class="form-label fw-semibold">Location</label>
+                    {{ form.event_location }}
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label fw-semibold">Description</label>
+                    {{ form.event_description }}
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Points Awarded</label>
+                    {{ form.points_awarded }}
+                    <small class="text-muted">
+                        Points are automatically assigned based on the selected event category.
+                    </small>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Capacity</label>
+                    {{ form.event_capacity }}
+                    <small class="text-muted">Maximum recommended capacity is 60.</small>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Event Image</label>
+                    {{ form.event_image }}
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label fw-semibold">Skill Tags</label>
+                    {{ form.skill_tags }}
+                    <small class="text-muted">Separate skills using commas.</small>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <a href="{% url 'organizer:events' %}" class="btn btn-light border px-4">Cancel</a>
+                <button type="submit" class="btn btn-primary px-4">
+                    <i class="bi bi-check-circle me-2"></i>{{ button_text }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const categoryField = document.getElementById("id_event_category");
+        const pointsField = document.getElementById("id_points_awarded");
+
+        const pointsByCategory = {
+            "Workshop": 50,
+            "Seminar": 20,
+            "Volunteer": 100,
+            "Competition": 150
+        };
+
+        function updatePoints() {
+            const selectedCategory = categoryField.value;
+            pointsField.value = pointsByCategory[selectedCategory] || 0;
+        }
+
+        if (categoryField && pointsField) {
+            updatePoints();
+            categoryField.addEventListener("change", updatePoints);
+        }
+    });
+</script>
+{% endblock %}

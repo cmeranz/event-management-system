@@ -31,7 +31,7 @@ class Event(models.Model):
     # This will save files to /media/event_images/ on your local drive
     event_image = models.ImageField(upload_to='event_images/', blank=True, null=True)
     points_awarded = models.IntegerField(default=0)
-    skill_tags = models.CharField(max_length=255, help_text="List skills separated by commas")
+    skill_tags = models.CharField(max_length=255, blank=True, null=True)
 
     event_capacity = models.PositiveIntegerField(
         default=0,
@@ -40,6 +40,12 @@ class Event(models.Model):
     event_category = models.CharField(max_length=100, default='General')
     def __str__(self):
         return self.event_title
+    
+    @property
+    def skill_list(self):
+        if not self.skill_tags:
+            return []
+        return [skill.strip() for skill in self.skill_tags.split(',') if skill.strip()]
 
 
 class Application(models.Model):
