@@ -7,7 +7,14 @@ from .decorators import student_required
 from django.contrib.auth.models import User
 from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView
 from django.urls import reverse_lazy
-from .forms import RegisterForm, LoginForm, ProfileForm, StyledPasswordResetForm, StyledSetPasswordForm
+from .forms import (
+    RegisterForm,
+    LoginForm,
+    ProfileForm,
+    StyledPasswordResetForm,
+    StyledSetPasswordForm,
+    RoleChoiceForm,
+)
 from .models import UserProfile
 from django.db.models import Q
 from core.models import Application
@@ -82,24 +89,43 @@ def logout_view(request):
 
 @login_required
 @never_cache
-@login_required
-@never_cache
 def redirect_dashboard(request):
     if request.user.is_superuser or request.user.is_staff:
         return redirect('admin_dashboard')
 
-    profile, created = UserProfile.objects.get_or_create(
-        user=request.user,
-        defaults={
-            'role': 'Student',
-            'student_staff_id': ''
-        }
-    )
+    if not hasattr(request.user, 'profile'):
+        return redirect('accounts:choose_role')
 
-    if profile.role == 'Organizer':
+    if request.user.profile.role == 'Organizer':
         return redirect('organizer:dashboard')
 
     return redirect('event_discovery:home')
+
+
+@login_required
+@never_cache
+def choose_role_view(request):
+    if request.user.is_staff or request.user.is_superuser:
+        return redirect('admin_dashboard')
+
+    if hasattr(request.user, 'profile'):
+        return redirect('accounts:redirect_dashboard')
+
+    if request.method == 'POST':
+        form = RoleChoiceForm(request.POST)
+        if form.is_valid():
+            role = form.cleaned_data['role']
+            UserProfile.objects.create(
+                user=request.user,
+                role=role,
+                student_staff_id=''
+            )
+            messages.success(request, 'Your role has been saved.')
+            return redirect('accounts:redirect_dashboard')
+    else:
+        form = RoleChoiceForm()
+
+    return render(request, 'accounts/choose_role.html', {'form': form})
 
 
 @student_required

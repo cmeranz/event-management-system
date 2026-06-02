@@ -94,6 +94,21 @@ class RegisterForm(forms.Form):
         return cleaned_data
 
 
+class RoleChoiceForm(forms.Form):
+    ROLE_CHOICES = [
+        ('Student', 'Student'),
+        ('Organizer', 'Organizer'),
+    ]
+
+    role = forms.ChoiceField(
+        choices=ROLE_CHOICES,
+        widget=forms.RadioSelect(attrs={
+            'class': 'form-check-input'
+        }),
+        label='Choose your role'
+    )
+
+
 class LoginForm(AuthenticationForm):
     username = forms.CharField(
         widget=forms.TextInput(attrs={
