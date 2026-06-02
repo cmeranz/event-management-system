@@ -71,6 +71,7 @@ class Application(models.Model):
 
     # Post-Event Attendance
     attended = models.BooleanField(default=False)
+    certificate = models.FileField(upload_to='certificates/', blank=True, null=True)
 
     def __str__(self):
         return f"{self.application_applicant.username} - {self.application_event.event_title}"

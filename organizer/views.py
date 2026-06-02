@@ -6,6 +6,7 @@ from django.db.models import Count, Q
 from core.models import Event, Application
 from .forms import EventForm
 from django.contrib import messages
+from core.certificate import generate_certificate
 
 POINTS_BY_CATEGORY = {
     'Workshop': 50,
@@ -169,13 +170,25 @@ def update_attendance(request, application_id, attendance_status):
     if attendance_status == 'attended':
         application.attended = True
         application.save()
-        messages.success(
-            request,
-            f'{application.application_applicant.get_full_name() or application.application_applicant.username} has been marked as attended.'
-        )
+        
+        # Generate certificate
+        try:
+            cert_path = generate_certificate(application)
+            application.certificate = cert_path
+            application.save()
+            messages.success(
+                request,
+                f'{application.application_applicant.get_full_name() or application.application_applicant.username} has been marked as attended and certificate generated.'
+            )
+        except Exception as e:
+            messages.warning(
+                request,
+                f'{application.application_applicant.get_full_name() or application.application_applicant.username} marked as attended, but certificate generation failed: {str(e)}'
+            )
 
     elif attendance_status == 'not_attended':
         application.attended = False
+        application.certificate = None
         application.save()
         messages.info(
             request,

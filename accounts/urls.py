@@ -14,6 +14,7 @@ urlpatterns = [
     path('student/dashboard/', views.student_dashboard, name='student_dashboard'),
     path('profile/', views.profile_view, name='profile'),
     path('profile/edit/', views.edit_profile_view, name='edit_profile'),
+    path('certificate/<int:application_id>/download/', views.download_certificate, name='download_certificate'),
     path('password-reset/', views.CustomPasswordResetView.as_view(), name='password_reset'),
     path(
         'password-reset/done/',

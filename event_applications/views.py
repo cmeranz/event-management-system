@@ -68,21 +68,16 @@ def cancel_application(request, application_id):
         application_applicant=request.user
     )
 
-    event = application.application_event or application.event_ID
-
-    if application.application_status != 'Pending':
-        messages.error(request, 'Only pending applications can be cancelled.')
-        return redirect('accounts:profile')
-
     if request.method == 'POST':
         application.delete()
         messages.success(request, 'Your application has been cancelled.')
         return redirect('accounts:profile')
+    
+    # For GET requests, redirect to profile
+    return redirect('accounts:profile')
 
-    return render(request, 'event_applications/cancel_application.html', {
-        'application': application,
-        'event': event
-    })
+
+   
 
 @student_required
 def my_applications(request):

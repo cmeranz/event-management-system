@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -7,6 +7,7 @@ from .decorators import student_required
 from django.contrib.auth.models import User
 from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView
 from django.urls import reverse_lazy
+from django.http import FileResponse
 from .forms import (
     RegisterForm,
     LoginForm,
@@ -19,6 +20,8 @@ from .models import UserProfile
 from django.db.models import Q
 from core.models import Application
 from event_discovery.models import SavedEvent
+import os
+from django.conf import settings
 
 
 def register_view(request):
@@ -288,3 +291,25 @@ class CustomPasswordResetConfirmView(PasswordResetConfirmView):
     template_name = 'accounts/password_reset_confirm.html'
     success_url = reverse_lazy('accounts:password_reset_complete')
     form_class = StyledSetPasswordForm
+
+
+@login_required
+def download_certificate(request, application_id):
+    application = get_object_or_404(Application, id=application_id)
+    
+    
+    cert_path = os.path.join(settings.MEDIA_ROOT, str(application.certificate))
+    
+    if not os.path.exists(cert_path):
+        messages.error(request, 'Certificate file not found.')
+        return redirect('accounts:profile')
+    
+    try:
+        response = FileResponse(open(cert_path, 'rb'), content_type='application/pdf')
+        event = application.application_event or application.event_ID
+        filename = f"{event.event_title.replace(' ', '_')}_certificate.pdf"
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+    except Exception as e:
+        messages.error(request, f'Error downloading certificate: {str(e)}')
+        return redirect('accounts:profile')
