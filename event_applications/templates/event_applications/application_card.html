@@ -63,8 +63,15 @@
                 </a>
 
                 {% if app.application_status == 'Pending' %}
-                    <a href="{% url 'event_applications:cancel_application' app.id %}" class="btn btn-outline-danger flex-fill">
-                        Cancel
+                    <form method="POST" action="{% url 'event_applications:cancel_application' app.id %}" style="display:contents">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger flex-fill">
+                            Cancel
+                        </button>
+                    </form>
+                {% elif app.attended and app.certificate %}
+                    <a href="{% url 'accounts:download_certificate' app.id %}" class="btn btn-um flex-fill">
+                        <i class="bi bi-download"></i> Certificate
                     </a>
                 {% elif app.attended %}
                     <button class="btn btn-light border flex-fill" disabled>

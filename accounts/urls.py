@@ -9,10 +9,12 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('redirect/', views.redirect_dashboard, name='redirect_dashboard'),
+    path('choose-role/', views.choose_role_view, name='choose_role'),
 
     path('student/dashboard/', views.student_dashboard, name='student_dashboard'),
     path('profile/', views.profile_view, name='profile'),
     path('profile/edit/', views.edit_profile_view, name='edit_profile'),
+    path('certificate/<int:application_id>/download/', views.download_certificate, name='download_certificate'),
     path('password-reset/', views.CustomPasswordResetView.as_view(), name='password_reset'),
     path(
         'password-reset/done/',

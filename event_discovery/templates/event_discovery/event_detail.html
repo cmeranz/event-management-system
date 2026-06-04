@@ -73,9 +73,17 @@
 
                     {% if request.user.is_authenticated and request.user.profile.role == 'Student' %}
                         {% if event.user_application_status %}
-                            <button class="btn btn-light border w-100" disabled>
-                                Application Status: {{ event.user_application_status }}
-                            </button>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-light border" disabled>
+                                    Application Status: {{ event.user_application_status }}
+                                </button>
+                                {% if event.user_application_status == 'Pending' and event.user_application_id %}
+                                    <form method="POST" action="{% url 'event_applications:cancel_application' event.user_application_id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline-danger">Cancel Application</button>
+                                    </form>
+                                {% endif %}
+                            </div>
                         {% else %}
                             <a href="{% url 'event_applications:apply_event' event.id %}" class="btn btn-um w-100">
                                 Apply for this Event

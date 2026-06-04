@@ -116,6 +116,9 @@ def event_detail(request, event_id):
 
             if application:
                 event.user_application_status = application.application_status
+                event.user_application_id = application.id
+            else:
+                event.user_application_id = None
 
             event.is_saved = SavedEvent.objects.filter(
                 student=request.user,

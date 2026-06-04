@@ -180,9 +180,15 @@
                             </a>
 
                             {% if request.user.is_authenticated and request.user.profile.role == 'Student' %}
-                                <a href="{% url 'event_applications:apply_event' event.id %}" class="btn btn-um flex-fill">
-                                    Apply
-                                </a>
+                                {% if event.user_application_status %}
+                                    <button class="btn btn-secondary flex-fill" disabled>
+                                        Applied
+                                    </button>
+                                {% else %}
+                                    <a href="{% url 'event_applications:apply_event' event.id %}" class="btn btn-um flex-fill">
+                                        Apply
+                                    </a>
+                                {% endif %}
                             {% elif request.user.is_authenticated %}
                                 <button class="btn btn-light border flex-fill" disabled>
                                     Apply
