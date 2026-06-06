@@ -4,6 +4,7 @@ from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, Set
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from .models import UserProfile
+from core.models import InterestTag, SkillTag
 
 
 class RegisterForm(forms.Form):
@@ -158,20 +159,29 @@ class ProfileForm(forms.ModelForm):
         })
     )
 
+    interests = forms.ModelMultipleChoiceField(
+        queryset=InterestTag.objects.all(),
+        required=False,
+        widget=forms.SelectMultiple(attrs={
+            'class': 'form-select tom-select',
+            'data-toggle': 'tom-select',
+            'size': 6,
+        })
+    )
+
+    skills = forms.ModelMultipleChoiceField(
+        queryset=SkillTag.objects.all(),
+        required=False,
+        widget=forms.SelectMultiple(attrs={
+            'class': 'form-select tom-select',
+            'data-toggle': 'tom-select',
+            'size': 6,
+        })
+    )
+
     class Meta:
         model = UserProfile
         fields = ['student_staff_id', 'interests', 'skills']
-
-        widgets = {
-            'interests': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Example: AI, volunteering, leadership'
-            }),
-            'skills': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Example: Python, teamwork, communication'
-            }),
-        }
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
