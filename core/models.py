@@ -77,6 +77,7 @@ class Application(models.Model):
     APP_STATUS_CHOICES = [
         ('Pending', 'Pending'),
         ('Approved', 'Approved'),
+        ('Completed', 'Completed'),
         ('Rejected', 'Rejected'),
     ]
 

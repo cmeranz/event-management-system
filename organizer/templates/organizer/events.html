@@ -47,6 +47,10 @@
                     <span class="status-badge bg-success-subtle text-success border border-success-subtle">
                         <i class="bi bi-check-circle me-1"></i>Approved
                     </span>
+                    {% elif event.event_approval_status == 'Completed' %}
+                    <span class="status-badge bg-info-subtle text-info border border-info-subtle">
+                        <i class="bi bi-check2-circle me-1"></i>Completed
+                    </span>
                     {% else %}
                     <span class="status-badge bg-danger-subtle text-danger border border-danger-subtle">
                         <i class="bi bi-x-circle me-1"></i>Rejected

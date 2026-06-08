@@ -164,12 +164,13 @@ def update_attendance(request, application_id, attendance_status):
         messages.error(request, 'You can only mark attendance for your own events.')
         return redirect('organizer:events')
 
-    if application.application_status != 'Approved':
+    if application.application_status not in ['Approved', 'Completed']:
         messages.error(request, 'Only approved applicants can be marked as attended.')
         return redirect('organizer:event_applicants', event_id=event.id)
 
     if attendance_status == 'attended':
         application.attended = True
+        application.application_status = 'Completed'
         application.save()
         
         try:
@@ -188,6 +189,7 @@ def update_attendance(request, application_id, attendance_status):
 
     elif attendance_status == 'not_attended':
         application.attended = False
+        application.application_status = 'Approved'
         application.certificate = None
         application.save()
         messages.info(

@@ -68,6 +68,8 @@
                                 <span class="status-badge bg-warning-subtle text-warning">Pending</span>
                                 {% elif event.event_approval_status == 'Approved' %}
                                 <span class="status-badge bg-success-subtle text-success">Approved</span>
+                                {% elif event.event_approval_status == 'Completed' %}
+                                <span class="status-badge bg-info-subtle text-info">Completed</span>
                                 {% else %}
                                 <span class="status-badge bg-danger-subtle text-danger">Rejected</span>
                                 {% endif %}
