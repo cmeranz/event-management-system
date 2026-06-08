@@ -1,8 +1,5 @@
 from django.contrib import admin
-
-# Register your models here.
-from django.contrib import admin
-from .models import Event, Application
+from .models import Event, Application, InterestTag, SkillTag
 
 
 @admin.register(Event)
@@ -14,7 +11,20 @@ class EventAdmin(admin.ModelAdmin):
     list_filter = ('event_approval_status', 'event_date')
 
     # This adds a search bar at the top
-    search_fields = ('event_title', 'event_description')
+    search_fields = ('event_title', 'event_description', 'skill_tags__name')
+    filter_horizontal = ('skill_tags',)
+
+
+@admin.register(InterestTag)
+class InterestTagAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)
+
+
+@admin.register(SkillTag)
+class SkillTagAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)
 
 
 @admin.register(Application)

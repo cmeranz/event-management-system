@@ -81,8 +81,9 @@ def event_list(request):
         events = events.filter(event_category__iexact=category_filter)
 
     if skill_filter:
-        events = events.filter(skill_tags__icontains=skill_filter)
+        events = events.filter(skill_tags__name__icontains=skill_filter).distinct()
 
+    events = events.prefetch_related('skill_tags')
     events = attach_application_status(request, events)
 
     context = {

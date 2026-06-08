@@ -71,9 +71,7 @@ def cancel_application(request, application_id):
     if request.method == 'POST':
         application.delete()
         messages.success(request, 'Your application has been cancelled.')
-        return redirect('accounts:profile')
     
-    # For GET requests, redirect to profile
     return redirect('accounts:profile')
 
 

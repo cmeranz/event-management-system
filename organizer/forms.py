@@ -1,8 +1,17 @@
 from django import forms
-from core.models import Event
+from core.models import Event, SkillTag
 
 
 class EventForm(forms.ModelForm):
+    skill_tags = forms.ModelMultipleChoiceField(
+        queryset=SkillTag.objects.all(),
+        required=False,
+        widget=forms.SelectMultiple(attrs={
+            'class': 'form-select tom-select',
+            'data-toggle': 'tom-select',
+            'size': 6,
+        })
+    )
     class Meta:
         model = Event
         fields = [
@@ -42,9 +51,10 @@ class EventForm(forms.ModelForm):
                 'class': 'form-control',
                 'readonly': 'readonly'
             }),
-            'skill_tags': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Example: Python, Teamwork, Communication'
+            'skill_tags': forms.SelectMultiple(attrs={
+                'class': 'form-select tom-select',
+                'data-toggle': 'tom-select',
+                'size': 6,
             }),
             'event_capacity': forms.NumberInput(attrs={
                 'class': 'form-control',
