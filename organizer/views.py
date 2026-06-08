@@ -46,7 +46,6 @@ def organizer_dashboard(request):
 
     return render(request, 'organizer/dashboard.html', context)
 
-
 @organizer_required
 @never_cache
 def organizer_events(request):
@@ -66,6 +65,7 @@ def create_event(request):
             event.event_approval_status = 'Pending'
             event.points_awarded = POINTS_BY_CATEGORY.get(event.event_category, 0)
             event.save()
+            form.save_m2m()
             return redirect('organizer:events')
     else:
         form = EventForm()
@@ -89,6 +89,7 @@ def edit_event(request, event_id):
             updated_event.event_approval_status = 'Pending'
             updated_event.points_awarded = POINTS_BY_CATEGORY.get(updated_event.event_category, 0)
             updated_event.save()
+            form.save_m2m()
             return redirect('organizer:events')
     else:
         form = EventForm(instance=event)
@@ -171,7 +172,6 @@ def update_attendance(request, application_id, attendance_status):
         application.attended = True
         application.save()
         
-        # Generate certificate
         try:
             cert_path = generate_certificate(application)
             application.certificate = cert_path
