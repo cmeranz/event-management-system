@@ -75,6 +75,7 @@
           <option value="">All Status</option>
           <option value="Pending" {% if request.GET.status == 'Pending' %}selected{% endif %}>Pending</option>
           <option value="Approved" {% if request.GET.status == 'Approved' %}selected{% endif %}>Approved</option>
+          <option value="Completed" {% if request.GET.status == 'Completed' %}selected{% endif %}>Completed</option>
           <option value="Rejected" {% if request.GET.status == 'Rejected' %}selected{% endif %}>Rejected</option>
         </select>
       </div>
@@ -120,6 +121,10 @@
       {% elif app.application_status == 'Approved' %}
         <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
           <i class="bi bi-check-circle me-1"></i> Approved
+        </span>
+      {% elif app.application_status == 'Completed' %}
+        <span class="badge bg-info-subtle text-info border border-info-subtle px-3 py-2">
+          <i class="bi bi-check2-circle me-1"></i> Completed
         </span>
       {% else %}
         <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2">
