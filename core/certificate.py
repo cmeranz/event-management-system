@@ -78,12 +78,6 @@ def generate_certificate(application):
     event_date = event.event_date.strftime("%B %d, %Y")
     c.drawCentredString(page_width / 2, page_height - 5.2 * inch, f"Event Date: {event_date}")
     
-    # Signature line
-    c.setFont("Helvetica", 10)
-    c.setFillColorRGB(0, 0, 0)
-    sig_y = 1.5 * inch
-    c.line(1.5 * inch, sig_y, 3.5 * inch, sig_y)
-    c.drawString(1.7 * inch, sig_y - 0.3 * inch, "Organizer Signature")
     
     # Certificate ID and date
     c.setFont("Helvetica", 9)
