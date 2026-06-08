@@ -75,13 +75,15 @@
                     <span class="status-badge bg-warning-subtle text-warning">Pending</span>
                     {% elif app.application_status == 'Approved' %}
                     <span class="status-badge bg-success-subtle text-success">Approved</span>
+                    {% elif app.application_status == 'Completed' %}
+                    <span class="status-badge bg-info-subtle text-info">Completed</span>
                     {% else %}
                     <span class="status-badge bg-danger-subtle text-danger">Rejected</span>
                     {% endif %}
                 </td>
 
                 <td>
-                    {% if app.application_status == 'Approved' %}
+                    {% if app.application_status == 'Approved' or app.application_status == 'Completed' %}
                         {% if app.attended %}
                             <div class="d-flex align-items-center gap-2">
                                 <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">

@@ -46,7 +46,6 @@ def organizer_dashboard(request):
 
     return render(request, 'organizer/dashboard.html', context)
 
-
 @organizer_required
 @never_cache
 def organizer_events(request):
@@ -66,6 +65,7 @@ def create_event(request):
             event.event_approval_status = 'Pending'
             event.points_awarded = POINTS_BY_CATEGORY.get(event.event_category, 0)
             event.save()
+            form.save_m2m()
             return redirect('organizer:events')
     else:
         form = EventForm()
@@ -89,6 +89,7 @@ def edit_event(request, event_id):
             updated_event.event_approval_status = 'Pending'
             updated_event.points_awarded = POINTS_BY_CATEGORY.get(updated_event.event_category, 0)
             updated_event.save()
+            form.save_m2m()
             return redirect('organizer:events')
     else:
         form = EventForm(instance=event)
@@ -163,15 +164,15 @@ def update_attendance(request, application_id, attendance_status):
         messages.error(request, 'You can only mark attendance for your own events.')
         return redirect('organizer:events')
 
-    if application.application_status != 'Approved':
+    if application.application_status not in ['Approved', 'Completed']:
         messages.error(request, 'Only approved applicants can be marked as attended.')
         return redirect('organizer:event_applicants', event_id=event.id)
 
     if attendance_status == 'attended':
         application.attended = True
+        application.application_status = 'Completed'
         application.save()
         
-        # Generate certificate
         try:
             cert_path = generate_certificate(application)
             application.certificate = cert_path
@@ -188,6 +189,7 @@ def update_attendance(request, application_id, attendance_status):
 
     elif attendance_status == 'not_attended':
         application.attended = False
+        application.application_status = 'Approved'
         application.certificate = None
         application.save()
         messages.info(
