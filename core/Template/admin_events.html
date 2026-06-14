@@ -1,10 +1,123 @@
 {% extends "admin_base.html" %}
 
 {% block content %}
+<style>
+    .event-modal-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        text-align: left;
+        margin-top: 16px;
+    }
+
+    .detail-pill {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 14px;
+        min-height: 82px;
+    }
+
+    .detail-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 1rem;
+    }
+
+    .blue-icon {
+        background: #e8f1ff;
+        color: #0b5ed7;
+    }
+
+    .green-icon {
+        background: #e8f7ee;
+        color: #198754;
+    }
+
+    .gold-icon {
+        background: #fff3cd;
+        color: #b7791f;
+    }
+
+    .purple-icon {
+        background: #f1e8ff;
+        color: #6f42c1;
+    }
+
+    .detail-pill small,
+    .description-box small {
+        display: block;
+        font-size: 0.72rem;
+        font-weight: 800;
+        color: #6b7280;
+        margin-bottom: 5px;
+        letter-spacing: 0.04em;
+    }
+
+    .detail-pill p {
+        margin: 0;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .skill-tag-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .skill-tag {
+        display: inline-block;
+        background: #e8f1ff;
+        color: #0b2a50;
+        border-radius: 999px;
+        padding: 5px 10px;
+        font-size: 0.78rem;
+        font-weight: 700;
+    }
+
+    .description-box {
+        grid-column: 1 / -1;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 15px;
+    }
+
+    .description-box p {
+        margin: 0;
+        color: #374151;
+        line-height: 1.6;
+    }
+
+    .modal-body {
+        padding: 18px;
+    }
+
+    .modal-footer .btn {
+        border-radius: 12px;
+        padding: 10px;
+        font-weight: 600;
+    }
+
+    @media (max-width: 576px) {
+        .event-modal-details {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h3 class="fw-bold">Events</h3>
     <span class="badge bg-secondary">{{ events|length }} Total Events</span>
-</div>
+</div> 
 
 <div class="card shadow-sm">
     <div class="table-responsive">
@@ -82,21 +195,59 @@
                                         {% endif %}
 
                                         <div class="text-start p-2">
-                                            <div class="mb-2">
-                                                <span class="text-muted small text-uppercase fw-bold">Date:</span>
-                                                <p class="mb-0">{{ event.event_date }}</p>
-                                            </div>
-                                            <div>
-                                                <span class="text-muted small text-uppercase fw-bold">Description:</span>
-                                                <p class="text-secondary">{{ event.event_description|linebreaks }}</p>
-                                            </div>
-                                            <div class="col-6">
+                                            <div class="event-modal-details">
 
-                                            <span class="text-muted small text-uppercase fw-bold">Capacity:</span>
-                                            <p class="mb-0 text-dark">
-                                                <i class="bi bi-people-fill me-1"></i>
-                                                {{ event.event_capacity|default:"Unlimited" }} Pax
-                                            </p>
+                                            <div class="detail-pill">
+                                                <div class="detail-icon blue-icon">
+                                                    <i class="bi bi-calendar-event-fill"></i>
+                                                </div>
+                                                <div>
+                                                    <small>DATE</small>
+                                                    <p>{{ event.event_date|date:"F d, Y" }}</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="detail-pill">
+                                                <div class="detail-icon green-icon">
+                                                    <i class="bi bi-people-fill"></i>
+                                                </div>
+                                                <div>
+                                                    <small>CAPACITY</small>
+                                                    <p>{{ event.event_capacity|default:"Unlimited" }} Pax</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="detail-pill">
+                                                <div class="detail-icon gold-icon">
+                                                    <i class="bi bi-star-fill"></i>
+                                                </div>
+                                                <div>
+                                                    <small>POINTS</small>
+                                                    <p>{{ event.points_awarded }} points</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="detail-pill">
+                                                <div class="detail-icon purple-icon">
+                                                    <i class="bi bi-tags-fill"></i>
+                                                </div>
+                                                <div>
+                                                    <small>SKILL TAGS</small>
+                                                    <div class="skill-tag-list">
+                                                        {% for skill in event.skill_tags.all %}
+                                                            <span class="skill-tag">{{ skill.name }}</span>
+                                                        {% empty %}
+                                                            <span class="text-muted">No skill tags added.</span>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="description-box">
+                                                <small>DESCRIPTION</small>
+                                                <p>{{ event.event_description|linebreaksbr }}</p>
+                                            </div>
+
                                         </div>
                                         </div>
                                     </div>
